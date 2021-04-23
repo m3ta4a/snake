@@ -2011,7 +2011,9 @@ dependencies = [
 name = "snake"
 version = "0.1.0"
 dependencies = [
+ "cgmath",
  "dynamo_lib",
+ "rodio",
 ]
 
 [[package]]

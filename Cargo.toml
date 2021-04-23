@@ -8,3 +8,5 @@ edition = "2018"
 
 [dependencies]
 dynamo_lib = { path = "../dynamo_lib" }
+cgmath = "0.17"
+rodio = "0.11"
