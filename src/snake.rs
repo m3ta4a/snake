@@ -28,12 +28,25 @@ impl Snake {
     }
   }
 
+  pub fn reset(&mut self) {
+    self.score = 0;
+    self.speed = util::STARTING_SNAKE_SPEED;
+    self.update_position((0.0, 0.0).into());
+    self.update_direction(None);
+    self.reset_body();
+  }
+
   pub fn reset_body(&mut self) {
     self.body = vec![self.head()];
   }
 
   pub fn grow_body(&mut self) {
-    let last_segment = self.body[self.body.len() - 1].clone();
+    let mut last_segment = self.body[self.body.len() - 1].clone();
+    last_segment.position = (
+      last_segment.position.x + -1.0 * self.direction().x * self.segment_size.x,
+      last_segment.position.y + -1.0 * self.direction().y * self.segment_size.y,
+    )
+      .into();
 
     self.body.append(&mut vec![last_segment]);
   }
@@ -95,7 +108,7 @@ impl Snake {
     min.x < b_max.x && max.x > b_min.x && min.y < b_max.y && max.y > b_min.y
   }
 
-  pub fn consumes(&self, quad: &Quad) -> bool {
+  pub fn collides(&self, quad: &Quad) -> bool {
     let snake_coords = coords::snake_coordinates(self.segment_size, self.position);
     let quad_coords = coords::snake_coordinates(quad.size, quad.position);
 

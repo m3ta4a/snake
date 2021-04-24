@@ -71,10 +71,7 @@ pub struct PlaySystem;
 
 impl System for PlaySystem {
   fn start(&mut self, state: &mut State) {
-    state.snake.score = 0;
-    state.snake.update_position((0.0, 0.0).into());
-    state.snake.update_direction(None);
-    state.snake.reset_body();
+    state.snake.reset();
 
     let random_position = self.random_position(state);
     state.pellet.update_position(random_position.into())
@@ -115,7 +112,16 @@ impl System for PlaySystem {
       }
     }
 
-    if state.snake.consumes(&state.pellet.quad) {
+    let body_after_head = &state.snake.body[1..];
+
+    for quad in body_after_head.iter() {
+      if state.snake.collides(quad) {
+        events.push(Event::SnakeCrashed);
+        state.game_state = GameState::GameOver;
+      }
+    }
+
+    if state.snake.collides(&state.pellet.quad) {
       state.snake.score = state.snake.score + 1;
       events.push(Event::Score(state.snake.score));
 
