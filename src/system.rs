@@ -68,23 +68,6 @@ impl System for MenuSystem {
 pub struct PlaySystem;
 
 impl System for PlaySystem {
-  fn update_state(&self, input: &mut Input, state: &mut State, events: &mut Vec<Event>) {
-    if input.esc_pressed {
-      input.clear();
-      events.push(Event::ButtonPressed);
-      state.game_state = GameState::MainMenu;
-
-      input.esc_pressed = false;
-    }
-
-    state.score.render_text.text = format!("Score: {}", state.snake.score);
-  }
-}
-
-#[derive(Debug)]
-pub struct SnakeSystem;
-
-impl System for SnakeSystem {
   fn start(&mut self, state: &mut State) {
     state.snake.score = 0;
     state.snake.update_position((0.0, 0.0).into());
@@ -95,6 +78,16 @@ impl System for SnakeSystem {
   }
 
   fn update_state(&self, input: &mut Input, state: &mut State, events: &mut Vec<Event>) {
+    if input.esc_pressed {
+      input.clear();
+      events.push(Event::ButtonPressed);
+      state.game_state = GameState::MainMenu;
+
+      input.esc_pressed = false;
+    }
+
+    state.score.render_text.text = format!("Score: {}", state.snake.score);
+
     state
       .snake
       .update_position(state.snake.position() + state.snake.direction * util::SNAKE_SPEED);
@@ -129,7 +122,7 @@ impl System for SnakeSystem {
   }
 }
 
-impl SnakeSystem {
+impl PlaySystem {
   fn random_position(&self, state: &mut State) -> cgmath::Vector2<f32> {
     let mut rng = rand::thread_rng();
 

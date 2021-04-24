@@ -43,7 +43,6 @@ pub struct SnakeGame {
   menu_system: MenuSystem,
   visibility_system: VisibilitySystem,
   play_system: PlaySystem,
-  snake_system: SnakeSystem,
   game_over_system: GameOverSystem,
   sound_pack: SoundPack,
 }
@@ -57,7 +56,6 @@ impl SnakeGame {
       menu_system: MenuSystem,
       visibility_system: VisibilitySystem,
       play_system: PlaySystem,
-      snake_system: SnakeSystem,
       game_over_system: GameOverSystem::new(),
       sound_pack: SoundPack::new(),
     }
@@ -108,9 +106,6 @@ impl Game for SnakeGame {
         }
       }
       GameState::Playing => {
-        self
-          .snake_system
-          .update_state(&mut self.input, &mut self.state, &mut self.events);
         self
           .play_system
           .update_state(&mut self.input, &mut self.state, &mut self.events);
