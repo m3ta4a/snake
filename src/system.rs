@@ -1,4 +1,5 @@
 use crate::any;
+use crate::coords;
 use crate::input::Input;
 use crate::snake_game::*;
 use crate::state::*;
@@ -126,27 +127,13 @@ impl PlaySystem {
   fn random_position(&self, state: &mut State) -> cgmath::Vector2<f32> {
     let mut rng = rand::thread_rng();
 
-    // Unclear why the dimensions of a -1 to 1 coordinate system are 4, but here we are
-    // Divide the size of the window by the size of a segment of the snake to get the number of cols and rows
-    let upper_bound_x = (4.0 / state.snake.segment_size.x).round() as i64;
-    let upper_bound_y = (4.0 / state.snake.segment_size.y).round() as i64;
+    let limit_x = (1.0 / state.snake.segment_size.x).round() as i32;
+    let limit_y = (1.0 / state.snake.segment_size.y).round() as i32;
 
-    let random_num_x = rng.gen_range(-upper_bound_x..upper_bound_x);
-    let random_num_y = rng.gen_range(-upper_bound_y..upper_bound_y);
+    let rand_x = rng.gen_range(-limit_x..limit_x);
+    let rand_y = rng.gen_range(-limit_y..limit_y);
 
-    // Divide by the limit to get a fraction, multiply by 4 to ensure the mantissa
-    // is a multiple of four to match snake "grid" positions
-    let x_4 = 4.0 * (random_num_x as f32 / upper_bound_x as f32);
-    let y_4 = 4.0 * (random_num_y as f32 / upper_bound_y as f32);
-
-    let i_x = x_4 as i32;
-    let i_y = y_4 as i32;
-
-    // Get just the mantissa
-    let f_x = x_4 - i_x as f32;
-    let f_y = y_4 - i_y as f32;
-
-    (f_x, f_y).into()
+    coords::screen_coordinates(state.snake.segment_size, (rand_x, rand_y))
   }
 }
 

@@ -35,8 +35,8 @@ impl Snake {
     let head = self.head();
 
     self.position = position;
-    let snake_coords = coords::snake_coordinates(self, position);
-    let screen_coords = coords::screen_coordinates(self, snake_coords);
+    let snake_coords = coords::snake_coordinates(self.segment_size, position);
+    let screen_coords = coords::screen_coordinates(self.segment_size, snake_coords);
 
     self.body = vec![Quad::new(screen_coords.into(), head.size)];
   }
@@ -46,8 +46,8 @@ impl Snake {
   }
 
   pub fn intersects(&self, quad: &Quad) -> bool {
-    let snake_coords = coords::snake_coordinates(self, self.position);
-    let screen_coords = coords::screen_coordinates(self, snake_coords);
+    let snake_coords = coords::snake_coordinates(self.segment_size, self.position);
+    let screen_coords = coords::screen_coordinates(self.segment_size, snake_coords);
 
     let radii = self.segment_size * 0.5;
     let min = screen_coords - radii;
@@ -64,8 +64,8 @@ impl Snake {
   }
 
   pub fn consumes(&self, quad: &Quad) -> bool {
-    let snake_coords = coords::snake_coordinates(self, self.position);
-    let quad_coords = coords::snake_coordinates(self, quad.position);
+    let snake_coords = coords::snake_coordinates(self.segment_size, self.position);
+    let quad_coords = coords::snake_coordinates(quad.size, quad.position);
 
     snake_coords.0 == quad_coords.0 && snake_coords.1 == quad_coords.1
   }
