@@ -41,7 +41,7 @@ impl State {
   pub fn new() -> Self {
     Self {
       game_state: GameState::MainMenu,
-      snake: Snake::new((0.8, 0.0).into()),
+      snake: Snake::new((0.0, 0.0).into(), (0.04, 0.04).into()),
       title_text: SnakeText {
         visible: false,
         render_text: RenderText {

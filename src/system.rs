@@ -80,10 +80,27 @@ impl System for PlaySystem {
 pub struct SnakeSystem;
 
 impl System for SnakeSystem {
-  fn update_state(&self, _input: &mut Input, _state: &mut State, _events: &mut Vec<Event>) {
-    // state
-    //   .snake
-    //   .update_position(state.snake.position() + state.snake.velocity);
+  fn update_state(&self, input: &mut Input, state: &mut State, _events: &mut Vec<Event>) {
+    state
+      .snake
+      .update_position(state.snake.position() + state.snake.velocity * 0.0025);
+
+    if input.up_pressed {
+      let velocity = (0.0, 1.0);
+      state.snake.update_velocity(velocity.into());
+    }
+    if input.down_pressed {
+      let velocity = (0.0, -1.0);
+      state.snake.update_velocity(velocity.into());
+    }
+    if input.right_pressed {
+      let velocity = (1.0, 0.0);
+      state.snake.update_velocity(velocity.into());
+    }
+    if input.left_pressed {
+      let velocity = (-1.0, 0.0);
+      state.snake.update_velocity(velocity.into());
+    }
   }
 }
 
