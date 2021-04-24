@@ -95,25 +95,17 @@ impl System for PlaySystem {
       .snake
       .update_position(state.snake.position() + state.snake.direction() * util::SNAKE_SPEED);
 
-    if input.up_pressed {
-      if !matches!(state.snake.direction, Down) {
-        state.snake.update_direction(Up)
-      };
+    if input.up_pressed && !matches!(state.snake.direction, Down) {
+      state.snake.update_direction(Up);
     }
-    if input.down_pressed {
-      if !matches!(state.snake.direction, Up) {
-        state.snake.update_direction(Down);
-      }
+    if input.down_pressed && !matches!(state.snake.direction, Up) {
+      state.snake.update_direction(Down);
     }
-    if input.right_pressed {
-      if !matches!(state.snake.direction, Left) {
-        state.snake.update_direction(Right);
-      }
+    if input.right_pressed && !matches!(state.snake.direction, Left) {
+      state.snake.update_direction(Right);
     }
-    if input.left_pressed {
-      if !matches!(state.snake.direction, Right) {
-        state.snake.update_direction(Left);
-      }
+    if input.left_pressed && !matches!(state.snake.direction, Right) {
+      state.snake.update_direction(Left);
     }
 
     for quad in state.walls.iter() {
