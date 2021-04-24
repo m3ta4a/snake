@@ -4,8 +4,9 @@ use dynamo_lib::geometry::quad::Quad;
 pub struct Snake {
   pub body: Vec<Quad>,
   pub segment_size: Vector2<f32>,
-  pub head_pos: Vector2<f32>,
-  pub velocity: Vector2<f32>,
+  pub real_pos: Vector2<f32>,
+  pub drawn_pos: Vector2<f32>,
+  pub direction: Vector2<f32>,
   pub score: u32,
   pub visible: bool,
 }
@@ -15,25 +16,26 @@ impl Snake {
     Snake {
       body: vec![Quad::new(position, size)],
       segment_size: size,
-      head_pos: position,
-      velocity: (0.0, 0.0).into(),
+      real_pos: position,
+      drawn_pos: position,
+      direction: (0.0, 0.0).into(),
       score: 0,
       visible: false,
     }
   }
 
-  pub fn update_velocity(&mut self, velocity: Vector2<f32>) {
-    self.velocity = velocity;
+  pub fn update_direction(&mut self, direction: Vector2<f32>) {
+    self.direction = direction;
   }
 
   pub fn position(&self) -> Vector2<f32> {
-    self.head_pos
+    self.real_pos
   }
 
   pub fn update_position(&mut self, position: Vector2<f32>) {
     let head = self.head();
 
-    self.head_pos = position;
+    self.real_pos = position;
 
     let new_x = if self.is_increment(position.x, self.segment_size.x) {
       self.round(position.x)
@@ -47,8 +49,8 @@ impl Snake {
     };
 
     // println!("{:?}", (new_x, new_y));
-
-    self.body = vec![Quad::new((new_x, new_y).into(), head.size)];
+    self.drawn_pos = (new_x, new_y).into();
+    self.body = vec![Quad::new(self.drawn_pos, head.size)];
   }
 
   fn head(&self) -> Quad {
@@ -65,18 +67,18 @@ impl Snake {
     (val_100 % inc_100).round() == 0.0
   }
 
-  // pub fn contains(&self, pellet: &Pellet) -> bool {
-  //   let radii = self.size() * 0.5;
-  //   let min = self.position() - radii;
-  //   let max = self.position() + radii;
+  pub fn collides(&self, quad: &Quad) -> bool {
+    let radii = self.segment_size * 0.5;
+    let min = self.drawn_pos - radii;
+    let max = self.drawn_pos + radii;
 
-  //   let b_radii = Vector2 {
-  //     x: ball.radius(),
-  //     y: ball.radius(),
-  //   };
-  //   let b_min = ball.position() - b_radii;
-  //   let b_max = ball.position() + b_radii;
+    let b_radii = Vector2 {
+      x: quad.size.x,
+      y: quad.size.y,
+    };
+    let b_min = quad.position - b_radii;
+    let b_max = quad.position + b_radii;
 
-  //   min.x < b_max.x && max.x > b_min.x && min.y < b_max.y && max.y > b_min.y
-  // }
+    min.x < b_max.x && max.x > b_min.x && min.y < b_max.y && max.y > b_min.y
+  }
 }

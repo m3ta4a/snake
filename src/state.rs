@@ -1,4 +1,5 @@
 use crate::snake::Snake;
+use dynamo_lib::geometry::quad::Quad;
 use dynamo_lib::geometry::Geometry;
 use dynamo_lib::renderer::render_text::{RenderText, TextRenderer, UNBOUNDED_F32};
 
@@ -27,6 +28,7 @@ impl SnakeText {
 
 pub struct State {
   pub game_state: GameState,
+  pub walls: Vec<Quad>,
   pub snake: Snake,
   // pub pellet: Pellet,
   pub title_text: SnakeText,
@@ -41,6 +43,12 @@ impl State {
   pub fn new() -> Self {
     Self {
       game_state: GameState::MainMenu,
+      walls: vec![
+        Quad::new((-1.0, -1.0).into(), (4.0, 0.02).into()),
+        Quad::new((-1.0, 1.0).into(), (4.0, 0.02).into()),
+        Quad::new((1.0, -1.0).into(), (0.02, 4.0).into()),
+        Quad::new((-1.0, -1.0).into(), (0.02, 4.0).into()),
+      ],
       snake: Snake::new((0.0, 0.0).into(), (0.04, 0.04).into()),
       title_text: SnakeText {
         visible: false,
@@ -109,6 +117,10 @@ impl State {
 
   fn update_geometry(&self, geometry: &mut Geometry) {
     if self.snake.visible {
+      for quad in self.walls.iter() {
+        geometry.push_quad(&quad);
+      }
+
       for quad in self.snake.body.iter() {
         geometry.push_quad(&quad);
       }

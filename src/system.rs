@@ -2,6 +2,7 @@ use crate::any;
 use crate::input::Input;
 use crate::snake_game::*;
 use crate::state::*;
+use crate::util;
 
 pub trait System {
   #[allow(unused_variables)]
@@ -29,6 +30,8 @@ pub struct MenuSystem;
 impl System for MenuSystem {
   fn start(&mut self, state: &mut State) {
     state.snake.score = 0;
+    state.snake.update_position((0.0, 0.0).into());
+    state.snake.update_direction((0.0, 0.0).into());
     state.play_button.render_text.focused = true;
     state.quit_button.render_text.focused = false;
   }
@@ -83,23 +86,25 @@ impl System for SnakeSystem {
   fn update_state(&self, input: &mut Input, state: &mut State, _events: &mut Vec<Event>) {
     state
       .snake
-      .update_position(state.snake.position() + state.snake.velocity * 0.0025);
+      .update_position(state.snake.position() + state.snake.direction * util::SNAKE_SPEED);
 
     if input.up_pressed {
-      let velocity = (0.0, 1.0);
-      state.snake.update_velocity(velocity.into());
+      state.snake.update_direction((0.0, 1.0).into());
     }
     if input.down_pressed {
-      let velocity = (0.0, -1.0);
-      state.snake.update_velocity(velocity.into());
+      state.snake.update_direction((0.0, -1.0).into());
     }
     if input.right_pressed {
-      let velocity = (1.0, 0.0);
-      state.snake.update_velocity(velocity.into());
+      state.snake.update_direction((1.0, 0.0).into());
     }
     if input.left_pressed {
-      let velocity = (-1.0, 0.0);
-      state.snake.update_velocity(velocity.into());
+      state.snake.update_direction((-1.0, 0.0).into());
+    }
+
+    for quad in state.walls.iter() {
+      if state.snake.collides(quad) {
+        state.game_state = GameState::GameOver;
+      }
     }
   }
 }
@@ -122,7 +127,7 @@ impl System for GameOverSystem {
 
     state.score.render_text.text = format!("{}", state.snake.score);
 
-    state.win_text.render_text.text = String::from("Good job!")
+    state.win_text.render_text.text = String::from("Game Over")
   }
 
   fn update_state(&self, input: &mut Input, state: &mut State, events: &mut Vec<Event>) {
