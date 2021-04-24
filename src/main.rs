@@ -1,5 +1,6 @@
 use dynamo_lib::start;
 
+mod coords;
 mod input;
 mod pellet;
 mod snake;

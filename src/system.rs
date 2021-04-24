@@ -68,16 +68,6 @@ impl System for MenuSystem {
 pub struct PlaySystem;
 
 impl System for PlaySystem {
-  fn start(&mut self, state: &mut State) {
-    state.snake.score = 0;
-    state.snake.update_position((0.0, 0.0).into());
-    state.snake.update_direction((0.0, 0.0).into());
-
-    let random_position = self.random_position(state);
-
-    state.pellet.update_position(random_position.into())
-  }
-
   fn update_state(&self, input: &mut Input, state: &mut State, events: &mut Vec<Event>) {
     if input.esc_pressed {
       input.clear();
@@ -91,7 +81,55 @@ impl System for PlaySystem {
   }
 }
 
-impl PlaySystem {
+#[derive(Debug)]
+pub struct SnakeSystem;
+
+impl System for SnakeSystem {
+  fn start(&mut self, state: &mut State) {
+    state.snake.score = 0;
+    state.snake.update_position((0.0, 0.0).into());
+    state.snake.update_direction((0.0, 0.0).into());
+
+    let random_position = self.random_position(state);
+    state.pellet.update_position(random_position.into())
+  }
+
+  fn update_state(&self, input: &mut Input, state: &mut State, events: &mut Vec<Event>) {
+    state
+      .snake
+      .update_position(state.snake.position() + state.snake.direction * util::SNAKE_SPEED);
+
+    if input.up_pressed {
+      state.snake.update_direction((0.0, 1.0).into());
+    }
+    if input.down_pressed {
+      state.snake.update_direction((0.0, -1.0).into());
+    }
+    if input.right_pressed {
+      state.snake.update_direction((1.0, 0.0).into());
+    }
+    if input.left_pressed {
+      state.snake.update_direction((-1.0, 0.0).into());
+    }
+
+    for quad in state.walls.iter() {
+      if state.snake.intersects(quad) {
+        events.push(Event::SnakeCrashed);
+        state.game_state = GameState::GameOver;
+      }
+    }
+
+    if state.snake.consumes(&state.pellet.quad) {
+      state.snake.score = state.snake.score + 1;
+      events.push(Event::Score(state.snake.score));
+
+      let random_position = self.random_position(state);
+      state.pellet.update_position(random_position.into())
+    }
+  }
+}
+
+impl SnakeSystem {
   fn random_position(&self, state: &mut State) -> cgmath::Vector2<f32> {
     let mut rng = rand::thread_rng();
 
@@ -116,37 +154,6 @@ impl PlaySystem {
     let f_y = y_4 - i_y as f32;
 
     (f_x, f_y).into()
-  }
-}
-
-#[derive(Debug)]
-pub struct SnakeSystem;
-
-impl System for SnakeSystem {
-  fn update_state(&self, input: &mut Input, state: &mut State, events: &mut Vec<Event>) {
-    state
-      .snake
-      .update_position(state.snake.position() + state.snake.direction * util::SNAKE_SPEED);
-
-    if input.up_pressed {
-      state.snake.update_direction((0.0, 1.0).into());
-    }
-    if input.down_pressed {
-      state.snake.update_direction((0.0, -1.0).into());
-    }
-    if input.right_pressed {
-      state.snake.update_direction((1.0, 0.0).into());
-    }
-    if input.left_pressed {
-      state.snake.update_direction((-1.0, 0.0).into());
-    }
-
-    for quad in state.walls.iter() {
-      if state.snake.collides(quad) {
-        events.push(Event::SnakeCrashed);
-        state.game_state = GameState::GameOver;
-      }
-    }
   }
 }
 
