@@ -1,4 +1,6 @@
 use crate::coords;
+use crate::util::Direction;
+use crate::util::Direction::*;
 use cgmath::Vector2;
 use dynamo_lib::geometry::quad::Quad;
 
@@ -6,7 +8,7 @@ pub struct Snake {
   pub body: Vec<Quad>,
   pub segment_size: Vector2<f32>,
   pub position: Vector2<f32>,
-  pub direction: Vector2<f32>,
+  pub direction: Direction,
   pub score: u32,
   pub visible: bool,
 }
@@ -17,10 +19,14 @@ impl Snake {
       body: vec![Quad::new(position, size)],
       segment_size: size,
       position: position,
-      direction: (0.0, 0.0).into(),
+      direction: None,
       score: 0,
       visible: false,
     }
+  }
+
+  pub fn reset_body(&mut self) {
+    self.body = vec![self.head()];
   }
 
   pub fn grow_body(&mut self) {
@@ -29,8 +35,18 @@ impl Snake {
     self.body.append(&mut vec![last_segment]);
   }
 
-  pub fn update_direction(&mut self, direction: Vector2<f32>) {
+  pub fn update_direction(&mut self, direction: Direction) {
     self.direction = direction;
+  }
+
+  pub fn direction(&self) -> Vector2<f32> {
+    match self.direction {
+      None => (0.0, 0.0).into(),
+      Up => (0.0, 1.0).into(),
+      Down => (0.0, -1.0).into(),
+      Left => (-1.0, 0.0).into(),
+      Right => (1.0, 0.0).into(),
+    }
   }
 
   pub fn position(&self) -> Vector2<f32> {

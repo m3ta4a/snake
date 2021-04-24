@@ -4,6 +4,7 @@ use crate::input::Input;
 use crate::snake_game::*;
 use crate::state::*;
 use crate::util;
+use crate::util::Direction::*;
 use rand::Rng;
 
 pub trait System {
@@ -72,7 +73,8 @@ impl System for PlaySystem {
   fn start(&mut self, state: &mut State) {
     state.snake.score = 0;
     state.snake.update_position((0.0, 0.0).into());
-    state.snake.update_direction((0.0, 0.0).into());
+    state.snake.update_direction(None);
+    state.snake.reset_body();
 
     let random_position = self.random_position(state);
     state.pellet.update_position(random_position.into())
@@ -91,19 +93,27 @@ impl System for PlaySystem {
 
     state
       .snake
-      .update_position(state.snake.position() + state.snake.direction * util::SNAKE_SPEED);
+      .update_position(state.snake.position() + state.snake.direction() * util::SNAKE_SPEED);
 
     if input.up_pressed {
-      state.snake.update_direction((0.0, 1.0).into());
+      if !matches!(state.snake.direction, Down) {
+        state.snake.update_direction(Up)
+      };
     }
     if input.down_pressed {
-      state.snake.update_direction((0.0, -1.0).into());
+      if !matches!(state.snake.direction, Up) {
+        state.snake.update_direction(Down);
+      }
     }
     if input.right_pressed {
-      state.snake.update_direction((1.0, 0.0).into());
+      if !matches!(state.snake.direction, Left) {
+        state.snake.update_direction(Right);
+      }
     }
     if input.left_pressed {
-      state.snake.update_direction((-1.0, 0.0).into());
+      if !matches!(state.snake.direction, Right) {
+        state.snake.update_direction(Left);
+      }
     }
 
     for quad in state.walls.iter() {
@@ -129,8 +139,8 @@ impl PlaySystem {
   fn random_position(&self, state: &mut State) -> cgmath::Vector2<f32> {
     let mut rng = rand::thread_rng();
 
-    let limit_x = (1.0 / state.snake.segment_size.x).round() as i32;
-    let limit_y = (1.0 / state.snake.segment_size.y).round() as i32;
+    let limit_x = (1.0 / state.snake.segment_size.x).round() as i32 - 1;
+    let limit_y = (1.0 / state.snake.segment_size.y).round() as i32 - 1;
 
     let rand_x = rng.gen_range(-limit_x..limit_x);
     let rand_y = rng.gen_range(-limit_y..limit_y);
