@@ -83,7 +83,7 @@ impl System for PlaySystem {
 pub struct SnakeSystem;
 
 impl System for SnakeSystem {
-  fn update_state(&self, input: &mut Input, state: &mut State, _events: &mut Vec<Event>) {
+  fn update_state(&self, input: &mut Input, state: &mut State, events: &mut Vec<Event>) {
     state
       .snake
       .update_position(state.snake.position() + state.snake.direction * util::SNAKE_SPEED);
@@ -103,6 +103,7 @@ impl System for SnakeSystem {
 
     for quad in state.walls.iter() {
       if state.snake.collides(quad) {
+        events.push(Event::SnakeCrashed);
         state.game_state = GameState::GameOver;
       }
     }

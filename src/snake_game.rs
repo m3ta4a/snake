@@ -32,6 +32,7 @@ impl SoundPack {
 pub enum Event {
   ButtonPressed,
   FocusChanged,
+  SnakeCrashed,
   Score(u32),
 }
 
@@ -83,7 +84,7 @@ impl Game for SnakeGame {
   ) {
     for event in &self.events {
       match event {
-        Event::FocusChanged | Event::ButtonPressed => {
+        Event::FocusChanged | Event::ButtonPressed | Event::SnakeCrashed => {
           sound_system.queue(self.sound_pack.bounce());
         }
         Event::Score(_) => {
