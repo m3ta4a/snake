@@ -1,6 +1,7 @@
 use dynamo_lib::start;
 
 mod input;
+mod pellet;
 mod snake;
 mod snake_game;
 mod state;

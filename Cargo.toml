@@ -10,3 +10,4 @@ edition = "2018"
 dynamo_lib = { path = "../dynamo_lib" }
 cgmath = "0.17"
 rodio = "0.11"
+rand = "0.8.3"

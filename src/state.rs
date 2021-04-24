@@ -1,3 +1,4 @@
+use crate::pellet::Pellet;
 use crate::snake::Snake;
 use dynamo_lib::geometry::quad::Quad;
 use dynamo_lib::geometry::Geometry;
@@ -30,7 +31,7 @@ pub struct State {
   pub game_state: GameState,
   pub walls: Vec<Quad>,
   pub snake: Snake,
-  // pub pellet: Pellet,
+  pub pellet: Pellet,
   pub title_text: SnakeText,
   pub play_button: SnakeText,
   pub quit_button: SnakeText,
@@ -44,12 +45,16 @@ impl State {
     Self {
       game_state: GameState::MainMenu,
       walls: vec![
+        // Unclear why the size needs to be 4 to stretch the coordinate system
+        // x & y min are -1, x & y max are +1
+        // where does 4 come from?? All I know is 2 only goes halfway across the window
         Quad::new((-1.0, -1.0).into(), (4.0, 0.02).into()),
         Quad::new((-1.0, 1.0).into(), (4.0, 0.02).into()),
         Quad::new((1.0, -1.0).into(), (0.02, 4.0).into()),
         Quad::new((-1.0, -1.0).into(), (0.02, 4.0).into()),
       ],
       snake: Snake::new((0.0, 0.0).into(), (0.04, 0.04).into()),
+      pellet: Pellet::new((0.0, 0.0).into(), 0.04),
       title_text: SnakeText {
         visible: false,
         render_text: RenderText {
@@ -126,9 +131,9 @@ impl State {
       }
     }
 
-    // if self.pellet.visible {
-    //   geometry.push_quad(&self.pellet.quad);
-    // }
+    if self.pellet.visible {
+      geometry.push_quad(&self.pellet.quad);
+    }
   }
 
   fn update_text(&self, text_renderer: &mut TextRenderer) {
