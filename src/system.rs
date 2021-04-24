@@ -117,8 +117,10 @@ impl System for PlaySystem {
       state.snake.score = state.snake.score + 1;
       events.push(Event::Score(state.snake.score));
 
+      state.snake.grow_body();
+
       let random_position = self.random_position(state);
-      state.pellet.update_position(random_position.into())
+      state.pellet.update_position(random_position.into());
     }
   }
 }

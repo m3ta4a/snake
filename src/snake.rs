@@ -23,6 +23,12 @@ impl Snake {
     }
   }
 
+  pub fn grow_body(&mut self) {
+    let last_segment = self.body[self.body.len() - 1].clone();
+
+    self.body.append(&mut vec![last_segment]);
+  }
+
   pub fn update_direction(&mut self, direction: Vector2<f32>) {
     self.direction = direction;
   }
@@ -32,13 +38,20 @@ impl Snake {
   }
 
   pub fn update_position(&mut self, position: Vector2<f32>) {
-    let head = self.head();
-
     self.position = position;
-    let snake_coords = coords::snake_coordinates(self.segment_size, position);
-    let screen_coords = coords::screen_coordinates(self.segment_size, snake_coords);
 
-    self.body = vec![Quad::new(screen_coords.into(), head.size)];
+    let head = self.head();
+    let cur_snake_coords = coords::snake_coordinates(self.segment_size, head.position);
+    let new_snake_coords = coords::snake_coordinates(self.segment_size, position);
+
+    if cur_snake_coords.0 != new_snake_coords.0 || cur_snake_coords.1 != new_snake_coords.1 {
+      let new_screen_coords = coords::screen_coordinates(self.segment_size, new_snake_coords);
+
+      let new_head = vec![Quad::new(new_screen_coords.into(), head.size)];
+      let old_body = &self.body[0..self.body.len() - 1];
+
+      self.body = [&new_head[..], old_body].concat();
+    }
   }
 
   fn head(&self) -> Quad {
