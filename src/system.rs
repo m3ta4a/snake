@@ -93,7 +93,7 @@ impl System for PlaySystem {
 
     state
       .snake
-      .update_position(state.snake.position() + state.snake.direction() * util::SNAKE_SPEED);
+      .update_position(state.snake.position() + state.snake.direction() * state.snake.speed);
 
     if input.up_pressed && !matches!(state.snake.direction, Down) {
       state.snake.update_direction(Up);
@@ -120,6 +120,7 @@ impl System for PlaySystem {
       events.push(Event::Score(state.snake.score));
 
       state.snake.grow_body();
+      state.snake.speed += util::SNAKE_SPEED_INC;
 
       let random_position = self.random_position(state);
       state.pellet.update_position(random_position.into());

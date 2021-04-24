@@ -1,4 +1,5 @@
 use crate::coords;
+use crate::util;
 use crate::util::Direction;
 use crate::util::Direction::*;
 use cgmath::Vector2;
@@ -9,6 +10,7 @@ pub struct Snake {
   pub segment_size: Vector2<f32>,
   pub position: Vector2<f32>,
   pub direction: Direction,
+  pub speed: f32,
   pub score: u32,
   pub visible: bool,
 }
@@ -20,6 +22,7 @@ impl Snake {
       segment_size: size,
       position: position,
       direction: None,
+      speed: util::STARTING_SNAKE_SPEED,
       score: 0,
       visible: false,
     }

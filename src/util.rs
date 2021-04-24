@@ -1,6 +1,7 @@
 #![macro_use]
 
-pub const SNAKE_SPEED: f32 = 0.01;
+pub const STARTING_SNAKE_SPEED: f32 = 0.005;
+pub const SNAKE_SPEED_INC: f32 = 0.00075;
 
 pub enum Direction {
   None,
