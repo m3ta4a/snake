@@ -8,6 +8,7 @@ use dynamo_lib::renderer::render_text::{RenderText, TextRenderer, UNBOUNDED_F32}
 pub enum GameState {
   MainMenu,
   Playing,
+  Paused,
   GameOver,
   Quitting,
 }
@@ -149,6 +150,12 @@ impl State {
       if text.visible {
         text_renderer.push_render_text(text.render_text.clone());
       }
+    }
+  }
+
+  pub fn pause_game(&mut self) {
+    if self.game_state == GameState::Playing {
+      self.game_state = GameState::Paused;
     }
   }
 }

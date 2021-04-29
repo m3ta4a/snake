@@ -21,8 +21,10 @@ impl System for VisibilitySystem {
     state.score.visible = is_in_game;
     state.pellet.visible = is_in_game;
 
-    state.title_text.visible = state.game_state == GameState::MainMenu;
-    state.play_button.visible = state.game_state == GameState::MainMenu;
+    state.title_text.visible =
+      state.game_state == GameState::MainMenu || state.game_state == GameState::Paused;
+    state.play_button.visible =
+      state.game_state == GameState::MainMenu || state.game_state == GameState::Paused;
     state.quit_button.visible = state.game_state == GameState::MainMenu;
 
     state.win_text.visible = state.game_state == GameState::GameOver;
@@ -34,6 +36,9 @@ pub struct MenuSystem;
 
 impl System for MenuSystem {
   fn start(&mut self, state: &mut State) {
+    state.title_text.render_text.text = String::from("SNAKE");
+    state.play_button.render_text.text = String::from("Play");
+
     state.play_button.render_text.focused = true;
     state.quit_button.render_text.focused = false;
   }
@@ -145,6 +150,24 @@ impl PlaySystem {
     let rand_y = rng.gen_range(-limit_y..limit_y);
 
     coords::screen_coordinates(state.snake.segment_size, (rand_x, rand_y))
+  }
+}
+
+#[derive(Debug)]
+pub struct PauseSystem;
+
+impl System for PauseSystem {
+  fn start(&mut self, state: &mut State) {
+    state.title_text.render_text.text = String::from("Paused");
+    state.play_button.render_text.text = String::from("Resume");
+    state.play_button.render_text.focused = true;
+  }
+
+  fn update_state(&self, input: &mut Input, state: &mut State, events: &mut Vec<Event>) {
+    if state.play_button.focused() && input.enter_pressed {
+      events.push(Event::ButtonPressed);
+      state.game_state = GameState::Playing;
+    }
   }
 }
 
